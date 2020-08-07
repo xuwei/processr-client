@@ -1,12 +1,17 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import * as serviceWorker from './serviceWorker'
+import App from './components/App'
+import Auth from './components/Auth'
+import AppDiaLog from './components/AppDialog'
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <Auth>
+    <AppDiaLog>
+      <App />
+    </AppDiaLog>
+    </Auth>
   </React.StrictMode>,
   document.getElementById('root')
 );
