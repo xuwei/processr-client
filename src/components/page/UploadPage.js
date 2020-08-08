@@ -3,7 +3,6 @@ import { Typography, Box, Grid, Container } from '@material-ui/core'
 import DialogModel from '../model/DialogModel'
 import { userContext } from '../context/UserContext'
 import { dialogContext } from '../context/DialogContext'
-import { useHistory } from 'react-router-dom';
 import UploadPanel from '../common/UploadPanel'
 import LoginPanel from '../common/LoginPanel'
 import { StandardPadding, ContentWidth } from '../Configs'
@@ -11,10 +10,8 @@ import CSVReader from 'react-csv-reader'
 
 function UploadPage() {
 
-    const history = useHistory();
     const userManager = useContext(userContext)
     const dialogManager = useContext(dialogContext)
-    const [historyList, setHistoryList] = useState([])
     const [csvFile, setCsvFile] = useState(null)
     const [xmlFile, setXmlFile] = useState(null)
     const [mergedData, setMergedData] = useState([])
@@ -33,7 +30,6 @@ function UploadPage() {
         for (var i = 1; i < data.length; i++) {
             mergedData.push(data[i])
         }
-
         setMergedData(mergedData)
         setCsvFile(fileInfo)
     }
@@ -71,14 +67,14 @@ function UploadPage() {
             <Box flexGrow={1} align="center" py={StandardPadding.PY}>
                 <Grid item sm={ContentWidth.SM} md={ContentWidth.MD}>
                     <Typography variant="h2" color="primary">
-                        Big Data Processr
+                        Data Processr
                     </Typography>
                     <Box px={StandardPadding.PX} py={StandardPadding.PY}>
                         <userContext.Consumer>
                             {(userManager) => (
                                 userManager.user ?
                                 <Box>
-                                    <UploadPanel proceed={proceed} handleCSVFileSelect={handleCSVFileSelect} handleXMLFileSelect={handleXMLFileSelect} csvFile={csvFile} xmlFile={xmlFile} progress={progress} px={StandardPadding.PX} py={StandardPadding.PY} />
+                                    <UploadPanel proceed={proceed} handleCSVFileSelect={handleCSVFileSelect} handleXMLFileSelect={handleXMLFileSelect} csvParseOptions={csvParseOptions} csvFile={csvFile} xmlFile={xmlFile} progress={progress} px={StandardPadding.PX} py={StandardPadding.PY} />
                                 </Box>
                                 :
                                 <Box>

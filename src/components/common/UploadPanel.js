@@ -29,8 +29,8 @@ function UploadPanel(props) {
                         <CSVReader id="csvUpload" cssClass="react-csv-input"
                                 onFileLoaded={props.handleCSVFileSelect} parserOptions={props.csvParseOptions}/>
                         </Box>
-                        { props.xmlFile ? 
-                        <Typography variant="subtitle1">{props.csvFile}</Typography>
+                        { props.csvFile ? 
+                        <Typography variant="subtitle1">{props.csvFile.name},{props.csvFile.size} bytes</Typography>
                         :
                         <Typography variant="subtitle1"></Typography>
                         }
@@ -43,7 +43,7 @@ function UploadPanel(props) {
                             <Input id="xmlSelect" type="file" accept=".xml" capture="capture" onChange={props.handleXMLFileSelect} />
                         </Box>
                         { props.xmlFile ? 
-                        <Typography variant="subtitle1">{props.xmlFile}</Typography>
+                        <Typography variant="subtitle1">{props.xmlFile.name}, {props.xmlFile.size} bytes</Typography>
                         :
                         <Typography variant="subtitle1"></Typography>
                         }

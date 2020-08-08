@@ -6,6 +6,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { Button } from '@material-ui/core'
 import { dialogContext } from './context/DialogContext'
+import ObjectUtil from './util/ObjectUtil'
 
 function AppDialog(props) {
   const [open, setOpen] = useState(false);
@@ -15,32 +16,33 @@ function AppDialog(props) {
     setDialogMsg(model)
   }
 
-  const handleClose = (callback) => {
-    setDialogMsg(null);
-    if (callback != null) { callback() }
+  const close = ()=> {
+    setOpen(false)
+    if (dialogMsg != null && ObjectUtil.isFunction(dialogMsg.callback))  {
+      dialogMsg.callback()
+    }
   }
 
   useEffect(() => {
     const model = dialogMsg
     if (model != null && model.title != null && model.message != null && model.confirm != null) {
       setOpen(true)
-    } else {
-      setOpen(false)
     }
   }, [dialogMsg])
 
   if (dialogMsg === null) {
     return(
-    <dialogContext.Provider value={{updateDialogMsg : showDialog}}>
-      {props.children}
-    </dialogContext.Provider>) 
+      <dialogContext.Provider value={{updateDialogMsg : showDialog}}>
+        {props.children}
+      </dialogContext.Provider>
+    )
   }
   return (
     <dialogContext.Provider value={{updateDialogMsg : showDialog}}>
       {props.children}
       <Dialog
         open={open}
-        onClose={handleClose(dialogMsg.callback)}
+        onClose={close}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
@@ -51,7 +53,7 @@ function AppDialog(props) {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose(dialogMsg.callback)} color="primary">
+          <Button color="primary" onClick={close}>
             {dialogMsg.confirm}
           </Button>
         </DialogActions>
