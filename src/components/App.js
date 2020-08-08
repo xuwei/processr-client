@@ -10,6 +10,7 @@ import { createMuiTheme, MuiThemeProvider, responsiveFontSizes } from '@material
 import CssBaseline from '@material-ui/core/CssBaseline'
 import { themeContext } from './context/ThemeContext'
 import { reactLocalStorage } from 'reactjs-localstorage';
+import AppDiaLog from './AppDialog'
 
 function App() {
 
@@ -43,6 +44,7 @@ function App() {
     <MuiThemeProvider theme={processrTheme}>
       <themeContext.Provider value={{darkTheme: themeManager.darkTheme, updateDarkTheme: updateTheme}}>
       <CssBaseline />
+      <AppDiaLog>
       <Router>
         <div className="App">
           <NavBar />
@@ -55,6 +57,7 @@ function App() {
           <Footer />
         </div>
       </Router>
+      </AppDiaLog>
       </themeContext.Provider>
     </MuiThemeProvider>
   )

@@ -2,12 +2,10 @@ import React, { useState, useEffect, useContext } from "react";
 import UserUtil from './util/UserUtil'
 import { userContext } from './context/UserContext'
 import { dialogContext } from './context/DialogContext'
-import DialogModel from './model/DialogModel'
 
 function Auth(props) {
 
     const [user, setUser] = useState(null)
-    const dialogManager = useContext(dialogContext)
 
     const update = (loggedInUser) => {
         setUser(loggedInUser)
@@ -17,10 +15,9 @@ function Auth(props) {
         UserUtil.fetchUser().then((loggedInUser) => {
             setUser(loggedInUser)
         }).catch((error)=> {
-            const dialog = new DialogModel("Message", error, "Ok")
-            dialogManager.updateDialogMsg(dialog)
+            alert(error)
         })
-    }, [dialogManager])
+    }, [])
 
     return(
         <userContext.Provider value={{user : user, updateUser : update}}>
