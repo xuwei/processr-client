@@ -20,7 +20,7 @@ function Auth(props) {
             const dialog = new DialogModel("Message", error, "Ok")
             dialogManager.updateDialogMsg(dialog)
         })
-    }, [])
+    }, [dialogManager])
 
     return(
         <userContext.Provider value={{user : user, updateUser : update}}>

@@ -7,6 +7,7 @@ import { useHistory } from 'react-router-dom';
 import UploadPanel from '../common/UploadPanel'
 import LoginPanel from '../common/LoginPanel'
 import { StandardPadding, ContentWidth } from '../Configs'
+import CSVReader from 'react-csv-reader'
 
 function UploadPage() {
 
@@ -16,38 +17,49 @@ function UploadPage() {
     const [historyList, setHistoryList] = useState([])
     const [csvFile, setCsvFile] = useState(null)
     const [xmlFile, setXmlFile] = useState(null)
+    const [mergedData, setMergedData] = useState([])
     const [progress, setProgress] = useState(0) 
 
-    const handleCSVFileSelect = (e) => {
-        const csv = e.target.files[0];
-        debugger;
-        setCsvFile(csv)
+    const csvParseOptions = {
+        header: true,
+        dynamicTyping: true,
+        skipEmptyLines: true
+    }
+
+    const handleCSVFileSelect = (data, fileInfo) => {
+
+        var mergedData = [] 
+        //validate csv here ... 
+        for (var i = 1; i < data.length; i++) {
+            mergedData.push(data[i])
+        }
+
+        setMergedData(mergedData)
+        setCsvFile(fileInfo)
     }
 
     const handleXMLFileSelect = (e) => {
         const xml = e.target.files[0];
-        debugger;
+        // validate xml here ... 
         setXmlFile(xml)
     }
     
     const proceed = (e) => {
-        const dialog = new DialogModel("Message", "Will process files now", "Ok")
+        var dialog = new DialogModel("Message", "Will process files now", "Ok")
+        dialog.callback = ()=> {
+            
+            for (var i = 0; i < mergedData.length; i++) {
+                console.log(mergedData[i])
+            }
+        }
         dialogManager.updateDialogMsg(dialog)
     }
 
     // handle whenever file is select
     useEffect(()=> {
-
-        const upload = () => {
-            // process upload here ... 
-            console.log(csvFile)
-            console.log(xmlFile)
-            debugger;
-        }
-
-        if (csvFile == null || xmlFile == null) return 
-        upload() 
-    }, [csvFile, xmlFile, userManager, history])
+        console.log(csvFile)
+        console.log(xmlFile)
+    }, [csvFile, xmlFile])
 
     // user's upload history 
     useEffect(() => {
@@ -66,7 +78,7 @@ function UploadPage() {
                             {(userManager) => (
                                 userManager.user ?
                                 <Box>
-                                    <UploadPanel proceed={proceed} handleCSVFileSelect={handleCSVFileSelect} handleXMLFileSelect={handleXMLFileSelect} progress={progress} px={StandardPadding.PX} py={StandardPadding.PY} />
+                                    <UploadPanel proceed={proceed} handleCSVFileSelect={handleCSVFileSelect} handleXMLFileSelect={handleXMLFileSelect} csvFile={csvFile} xmlFile={xmlFile} progress={progress} px={StandardPadding.PX} py={StandardPadding.PY} />
                                 </Box>
                                 :
                                 <Box>

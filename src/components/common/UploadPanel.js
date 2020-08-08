@@ -1,7 +1,16 @@
 import React from 'react'
+import CSVReader from 'react-csv-reader'
 import { Button, Typography, Box, LinearProgress, Input, Paper } from '@material-ui/core'
 
 function UploadPanel(props) {
+
+    const selectCSV = ()=> {
+        document.getElementById("react-csv-reader-input").click()
+    }
+
+    const selectXML = ()=> {
+        document.getElementById("xmlSelect").click()
+    }
 
     return (
         <Box px={props.px} pb={props.pb} pt={props.pt}>
@@ -16,10 +25,31 @@ function UploadPanel(props) {
                         <LinearProgress variant="determinate" value={props.progress} />
                     </Box>
                     <Box px={4} pb={4}>
-                        <Input id="csvSelect" type="file" accept=".csv" capture="capture" onChange={props.handleCSVFileSelect} />
+                        <Box visibility="hidden">
+                        <CSVReader id="csvUpload" cssClass="react-csv-input"
+                                onFileLoaded={props.handleCSVFileSelect} parserOptions={props.csvParseOptions}/>
+                        </Box>
+                        { props.xmlFile ? 
+                        <Typography variant="subtitle1">{props.csvFile}</Typography>
+                        :
+                        <Typography variant="subtitle1"></Typography>
+                        }
+                        <Button size="large" variant="outlined" color="primary" onClick={selectCSV}>
+                            Select CSV
+                        </Button>
                     </Box>
                     <Box px={4} pb={4}>
-                        <Input id="xmlSelect" type="file" accept=".xml" capture="capture" onChange={props.handleXMLFileSelect} />
+                        <Box visibility="hidden">
+                            <Input id="xmlSelect" type="file" accept=".xml" capture="capture" onChange={props.handleXMLFileSelect} />
+                        </Box>
+                        { props.xmlFile ? 
+                        <Typography variant="subtitle1">{props.xmlFile}</Typography>
+                        :
+                        <Typography variant="subtitle1"></Typography>
+                        }
+                        <Button size="large" variant="outlined" color="primary" onClick={selectXML}>
+                            Select XML
+                        </Button>
                     </Box>
                     <br/>
                     <Button id="uploadButton2" size="large" variant="contained" color="primary" onClick={props.proceed}>

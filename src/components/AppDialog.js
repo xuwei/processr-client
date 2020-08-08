@@ -5,7 +5,6 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { Button } from '@material-ui/core'
-import DialogModel from './model/DialogModel'
 import { dialogContext } from './context/DialogContext'
 
 function AppDialog(props) {
@@ -13,12 +12,12 @@ function AppDialog(props) {
   const [dialogMsg, setDialogMsg] = useState(null)
 
   const showDialog = (model) => {
-    debugger;
     setDialogMsg(model)
   }
 
-  const handleClose = () => {
+  const handleClose = (callback) => {
     setDialogMsg(null);
+    if (callback != null) { callback() }
   }
 
   useEffect(() => {
@@ -41,7 +40,7 @@ function AppDialog(props) {
       {props.children}
       <Dialog
         open={open}
-        onClose={handleClose}
+        onClose={handleClose(dialogMsg.callback)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
@@ -52,7 +51,7 @@ function AppDialog(props) {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="primary">
+          <Button onClick={handleClose(dialogMsg.callback)} color="primary">
             {dialogMsg.confirm}
           </Button>
         </DialogActions>

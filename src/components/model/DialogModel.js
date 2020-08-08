@@ -3,5 +3,6 @@ export default class DialogModel {
         this.title = title 
         this.message = message
         this.confirm = confirm
+        this.callback = null 
     } 
 }
