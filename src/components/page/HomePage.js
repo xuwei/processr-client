@@ -1,6 +1,6 @@
 import React from 'react'
-import { Hidden, Link, Paper, Typography, Box, Grid, Container, Button } from '@material-ui/core'
-import { StaticRoutes, ContentWidth, StandardPadding, LargePadding } from '../Configs'
+import { Typography, Box, Grid, Container, Button } from '@material-ui/core'
+import { StaticRoutes, ContentWidth, LargePadding } from '../Configs'
 
 function HomePage() {
     return (

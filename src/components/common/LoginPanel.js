@@ -3,18 +3,22 @@ import React, { useContext } from 'react'
 import { Hidden, Paper, Box, Typography, Button } from '@material-ui/core'
 import GoogleButton from 'react-google-button'
 import UserUtil from '../util/UserUtil'
-import MessageUtil from '../util/MessageUtil'
 import { userContext } from '../context/UserContext'
+import { dialogContext } from '../context/DialogContext'
+import DialogModel from '../model/DialogModel'
 
 function LoginPanel(props) {
 
     const userManager = useContext(userContext)
+    const dialogManager = useContext(dialogContext)
+
     const login = () => {
         UserUtil.login().then((loggedInUser) => {
             // use context obj's callback method to update user 
             userManager.updateUser(loggedInUser)
         }).catch((error) => {
-            MessageUtil.messagePopup(error)
+            const dialog = new DialogModel("Message", error, "Ok")
+            dialogManager.updateDialogMsg(dialog)
         })
     }
 

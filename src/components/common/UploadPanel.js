@@ -3,10 +3,6 @@ import { Button, Typography, Box, LinearProgress, Input, Paper } from '@material
 
 function UploadPanel(props) {
 
-    const fileSelect = () => {
-        document.getElementById("uploadInput").click();
-    }
-
     return (
         <Box px={props.px} pb={props.pb} pt={props.pt}>
             <Paper variant="outlined">
@@ -19,13 +15,18 @@ function UploadPanel(props) {
                     <Box px={4} pb={4}>
                         <LinearProgress variant="determinate" value={props.progress} />
                     </Box>
-                    <Input id="uploadInput" hidden type="file" accept="video/*" capture="capture" onChange={props.handleFileSelect} />
-                    <Button id="uploadButton" size="large" variant="contained" color="primary" onClick={fileSelect}>
-                        Process
+                    <Box px={4} pb={4}>
+                        <Input id="csvSelect" type="file" accept=".csv" capture="capture" onChange={props.handleCSVFileSelect} />
+                    </Box>
+                    <Box px={4} pb={4}>
+                        <Input id="xmlSelect" type="file" accept=".xml" capture="capture" onChange={props.handleXMLFileSelect} />
+                    </Box>
+                    <br/>
+                    <Button id="uploadButton2" size="large" variant="contained" color="primary" onClick={props.proceed}>
+                        Proceed
                     </Button>
                 </Box>
             </Paper>
-            
         </Box>
     )
 }

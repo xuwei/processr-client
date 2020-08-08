@@ -1,28 +1,38 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { Typography, Box, Grid, Container } from '@material-ui/core'
-import MessageUtil from '../util/MessageUtil'
+import DialogModel from '../model/DialogModel'
 import { userContext } from '../context/UserContext'
-import firebase from '../../Firebase.js';
+import { dialogContext } from '../context/DialogContext'
 import { useHistory } from 'react-router-dom';
 import UploadPanel from '../common/UploadPanel'
 import LoginPanel from '../common/LoginPanel'
-import DateUtil from '../util/DateUtil'
 import { StandardPadding, ContentWidth } from '../Configs'
 
 function UploadPage() {
 
     const history = useHistory();
     const userManager = useContext(userContext)
+    const dialogManager = useContext(dialogContext)
     const [historyList, setHistoryList] = useState([])
     const [csvFile, setCsvFile] = useState(null)
     const [xmlFile, setXmlFile] = useState(null)
     const [progress, setProgress] = useState(0) 
 
-    const handleFileSelect = async (e) => {
+    const handleCSVFileSelect = (e) => {
         const csv = e.target.files[0];
-        const xml = e.target.files[1];
+        debugger;
         setCsvFile(csv)
+    }
+
+    const handleXMLFileSelect = (e) => {
+        const xml = e.target.files[0];
+        debugger;
         setXmlFile(xml)
+    }
+    
+    const proceed = (e) => {
+        const dialog = new DialogModel("Message", "Will process files now", "Ok")
+        dialogManager.updateDialogMsg(dialog)
     }
 
     // handle whenever file is select
@@ -30,6 +40,9 @@ function UploadPage() {
 
         const upload = () => {
             // process upload here ... 
+            console.log(csvFile)
+            console.log(xmlFile)
+            debugger;
         }
 
         if (csvFile == null || xmlFile == null) return 
@@ -53,7 +66,7 @@ function UploadPage() {
                             {(userManager) => (
                                 userManager.user ?
                                 <Box>
-                                    <UploadPanel handleFileSelect={handleFileSelect} progress={progress} px={StandardPadding.PX} py={StandardPadding.PY} />
+                                    <UploadPanel proceed={proceed} handleCSVFileSelect={handleCSVFileSelect} handleXMLFileSelect={handleXMLFileSelect} progress={progress} px={StandardPadding.PX} py={StandardPadding.PY} />
                                 </Box>
                                 :
                                 <Box>

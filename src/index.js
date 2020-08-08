@@ -7,11 +7,11 @@ import AppDiaLog from './components/AppDialog'
 
 ReactDOM.render(
   <React.StrictMode>
-    <Auth>
     <AppDiaLog>
-      <App />
+      <Auth>
+        <App/>
+      </Auth>
     </AppDiaLog>
-    </Auth>
   </React.StrictMode>,
   document.getElementById('root')
 );

@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import UserUtil from './util/UserUtil'
-import MessageUtil from './util/MessageUtil'
 import { userContext } from './context/UserContext'
+import { dialogContext } from './context/DialogContext'
+import DialogModel from './model/DialogModel'
 
 function Auth(props) {
 
     const [user, setUser] = useState(null)
+    const dialogManager = useContext(dialogContext)
 
     const update = (loggedInUser) => {
         setUser(loggedInUser)
@@ -15,7 +17,8 @@ function Auth(props) {
         UserUtil.fetchUser().then((loggedInUser) => {
             setUser(loggedInUser)
         }).catch((error)=> {
-            MessageUtil.messagePopup(error)
+            const dialog = new DialogModel("Message", error, "Ok")
+            dialogManager.updateDialogMsg(dialog)
         })
     }, [])
 
