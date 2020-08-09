@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import UserUtil from './util/UserUtil'
 import { userContext } from './context/UserContext'
-import { dialogContext } from './context/DialogContext'
 
 function Auth(props) {
 

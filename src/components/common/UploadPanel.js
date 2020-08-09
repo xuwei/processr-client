@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react'
-import CSVReader from 'react-csv-reader'
+import React from 'react'
 import { Button, Typography, Box, LinearProgress, Input, Paper } from '@material-ui/core'
+import ObjectUtil from '../util/ObjectUtil'
 
 function UploadPanel(props) {
 
@@ -27,12 +27,10 @@ function UploadPanel(props) {
                     </Box>
                     <Box px={4} pb={4}>
                         <Box visibility="hidden">
-                        {/* <CSVReader id="csvUpload" cssClass="react-csv-input"
-                                onFileLoaded={props.handleCSVFileSelect} parserOptions={props.csvParseOptions}/> */}
                             <Input id="csvSelect" type="file" accept=".csv" capture="capture" onChange={props.handleCSVFileSelect} />
                         </Box>
                         { props.csvFile ? 
-                        <Typography variant="subtitle1">{props.csvFile.name},{props.csvFile.size} bytes</Typography>
+                        <Typography variant="subtitle1">{props.csvFile.name},{ObjectUtil.bytesToSize(props.csvFile.size)}</Typography>
                         :
                         <Typography variant="subtitle1"></Typography>
                         }

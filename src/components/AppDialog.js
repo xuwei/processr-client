@@ -21,7 +21,7 @@ function AppDialog(props) {
   }
 
   useEffect(()=> {
-    if (open == false) {
+    if (open === false) {
       if (dialogMsg != null && ObjectUtil.isFunction(dialogMsg.callback))  {
         dialogMsg.callback()
       }

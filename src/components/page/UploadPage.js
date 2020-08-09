@@ -7,6 +7,7 @@ import UploadPanel from '../common/UploadPanel'
 import LoginPanel from '../common/LoginPanel'
 import { StandardPadding, ContentWidth } from '../Configs'
 import ObjectUtil from '../util/ObjectUtil'
+import DateUtil from '../util/DateUtil'
 import Papa from 'papaparse'
 import MemberModel from '../model/MemberModel'
 
@@ -47,35 +48,41 @@ function UploadPage() {
     const processSuccess = () => {
         var dialog = new DialogModel("Message", "Processing completed !", "Get JSON file")
         dialog.callback = ()=> {
-            
             setProgress(0)
-            ObjectUtil.downloadObjectAsJson(mergedData, "dummy")
+            var prefix = ""
+            if(mergedData.length >= 0) {
+                var elem = mergedData[0]
+                if (elem != null && elem["transactionIdentifier"] != null) {
+                    prefix = elem["transactionIdentifier"] + "_"
+                } else {
+                    prefix = csvFile.name + "_"
+                }
+            }
+            ObjectUtil.downloadObjectAsJson(mergedData, prefix + DateUtil.nowReadable())
         }
         dialogManager.updateDialogMsg(dialog)
     }
 
     const abortProcessing = (e) => {
-        setAborting(true)
         abort = true 
     }
 
     const proceed = (e) => {
-        setAborting(false)
-        abort = false 
         var dialog = new DialogModel("Message", "Will process files now", "Ok")
         dialog.callback = ()=> {
             setProcessing(true)
             Papa.parse(csvFile, {
                 header: true,
-                dynamicTyping: true,
+                dynamicTyping: false,
                 worker: false,
                 skipEmptyLines: true,
                 fastMode: true, 
-                preview: 200000,
                 step: (results, parser) => {
                     parser.pause()
-                    if(aborting == true) {
+                    console.log("abort - " + abort)
+                    if(abort === true) {
                         parser.abort()
+                        debugger;
                         return
                     }
                     var data = results.data

@@ -9,4 +9,9 @@ const fromNow = (timestamp) => {
     return moment(timestamp.toDate()).fromNow()
 }
 
-export default { now, fromNow }
+const nowReadable = () => {
+    var today = moment().format()
+    return today
+}
+
+export default { now, nowReadable, fromNow }
