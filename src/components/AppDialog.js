@@ -18,10 +18,15 @@ function AppDialog(props) {
 
   const close = ()=> {
     setOpen(false)
-    if (dialogMsg != null && ObjectUtil.isFunction(dialogMsg.callback))  {
-      dialogMsg.callback()
-    }
   }
+
+  useEffect(()=> {
+    if (open == false) {
+      if (dialogMsg != null && ObjectUtil.isFunction(dialogMsg.callback))  {
+        dialogMsg.callback()
+      }
+    }
+  }, [open])
 
   useEffect(() => {
     const model = dialogMsg

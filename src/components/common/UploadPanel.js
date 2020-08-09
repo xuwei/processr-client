@@ -1,11 +1,11 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import CSVReader from 'react-csv-reader'
 import { Button, Typography, Box, LinearProgress, Input, Paper } from '@material-ui/core'
 
 function UploadPanel(props) {
 
     const selectCSV = ()=> {
-        document.getElementById("react-csv-reader-input").click()
+        document.getElementById("csvSelect").click()
     }
 
     const selectXML = ()=> {
@@ -17,24 +17,26 @@ function UploadPanel(props) {
             <Paper variant="outlined">
                 <Box px={4} pt={4}>
                     <Typography variant="h5">
-                        Upload a new CSV/XML pair
+                        Upload a new CSV/XML dataset
                      </Typography>
                 </Box>
                 <Box px={4} py={4}>
-                    <Box px={4} pb={4}>
-                        <LinearProgress variant="determinate" value={props.progress} />
+                    <Box hidden={!props.processing} px={4} pb={4}>
+                        <Typography variant="subtitle1">rows processed: {props.rowsProcessed}</Typography>
+                        <LinearProgress color="primary"/>
                     </Box>
                     <Box px={4} pb={4}>
                         <Box visibility="hidden">
-                        <CSVReader id="csvUpload" cssClass="react-csv-input"
-                                onFileLoaded={props.handleCSVFileSelect} parserOptions={props.csvParseOptions}/>
+                        {/* <CSVReader id="csvUpload" cssClass="react-csv-input"
+                                onFileLoaded={props.handleCSVFileSelect} parserOptions={props.csvParseOptions}/> */}
+                            <Input id="csvSelect" type="file" accept=".csv" capture="capture" onChange={props.handleCSVFileSelect} />
                         </Box>
                         { props.csvFile ? 
                         <Typography variant="subtitle1">{props.csvFile.name},{props.csvFile.size} bytes</Typography>
                         :
                         <Typography variant="subtitle1"></Typography>
                         }
-                        <Button size="large" variant="outlined" color="primary" onClick={selectCSV}>
+                        <Button disabled={props.processing} size="large" variant="outlined" color="primary" onClick={selectCSV}>
                             Select CSV
                         </Button>
                     </Box>
@@ -47,14 +49,20 @@ function UploadPanel(props) {
                         :
                         <Typography variant="subtitle1"></Typography>
                         }
-                        <Button size="large" variant="outlined" color="primary" onClick={selectXML}>
+                        <Button disabled size="large" variant="outlined" color="primary" onClick={selectXML}>
                             Select XML
                         </Button>
                     </Box>
                     <br/>
-                    <Button id="uploadButton2" size="large" variant="contained" color="primary" onClick={props.proceed}>
+                    <Button disabled={props.processing} id="proceed" size="large" variant="contained" color="primary" onClick={props.proceed}>
                         Proceed
                     </Button>
+                    <br/><br/>
+                    <Box hidden={!props.processing} px={4} pb={4}>
+                        <Button  id="abort" size="large" variant="contained" color="secondary" onClick={props.abortProcessing}>
+                            Abort
+                        </Button>
+                    </Box>
                 </Box>
             </Paper>
         </Box>

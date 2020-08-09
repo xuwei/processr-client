@@ -6,7 +6,9 @@ import { dialogContext } from '../context/DialogContext'
 import UploadPanel from '../common/UploadPanel'
 import LoginPanel from '../common/LoginPanel'
 import { StandardPadding, ContentWidth } from '../Configs'
-import CSVReader from 'react-csv-reader'
+import ObjectUtil from '../util/ObjectUtil'
+import Papa from 'papaparse'
+import MemberModel from '../model/MemberModel'
 
 function UploadPage() {
 
@@ -14,39 +16,84 @@ function UploadPage() {
     const dialogManager = useContext(dialogContext)
     const [csvFile, setCsvFile] = useState(null)
     const [xmlFile, setXmlFile] = useState(null)
-    const [mergedData, setMergedData] = useState([])
     const [progress, setProgress] = useState(0) 
+    const [processing, setProcessing] = useState(false)
+    const [aborting, setAborting] = useState(false)
+    const [rowsProcessed, setRowsProcessed] = useState(0)
+    var mergedData = [] 
+    var abort = false
 
-    const csvParseOptions = {
-        header: true,
-        dynamicTyping: true,
-        skipEmptyLines: true
-    }
-
-    const handleCSVFileSelect = (data, fileInfo) => {
-
-        var mergedData = [] 
-        //validate csv here ... 
-        for (var i = 1; i < data.length; i++) {
-            mergedData.push(data[i])
-        }
-        setMergedData(mergedData)
-        setCsvFile(fileInfo)
+    const handleCSVFileSelect = (e) => {
+        const csv = e.target.files[0];
+        setCsvFile(csv)
+        setProgress(0)
     }
 
     const handleXMLFileSelect = (e) => {
         const xml = e.target.files[0];
         // validate xml here ... 
         setXmlFile(xml)
+        setProgress(0)
+    }
+
+    const processFailed = (invalidData) => {
+        var dialog = new DialogModel("Message", "Processing failed ! Invalid data confronted: " + invalidData, "Ok")
+        dialog.callback = ()=> {
+            setCsvFile(null)
+        }
+        dialogManager.updateDialogMsg(dialog)
     }
     
-    const proceed = (e) => {
-        var dialog = new DialogModel("Message", "Will process files now", "Ok")
+    const processSuccess = () => {
+        var dialog = new DialogModel("Message", "Processing completed !", "Get JSON file")
         dialog.callback = ()=> {
             
-            for (var i = 0; i < mergedData.length; i++) {
-                console.log(mergedData[i])
-            }
+            setProgress(0)
+            ObjectUtil.downloadObjectAsJson(mergedData, "dummy")
+        }
+        dialogManager.updateDialogMsg(dialog)
+    }
+
+    const abortProcessing = (e) => {
+        setAborting(true)
+        abort = true 
+    }
+
+    const proceed = (e) => {
+        setAborting(false)
+        abort = false 
+        var dialog = new DialogModel("Message", "Will process files now", "Ok")
+        dialog.callback = ()=> {
+            setProcessing(true)
+            Papa.parse(csvFile, {
+                header: true,
+                dynamicTyping: true,
+                worker: false,
+                skipEmptyLines: true,
+                fastMode: true, 
+                preview: 200000,
+                step: (results, parser) => {
+                    parser.pause()
+                    if(aborting == true) {
+                        parser.abort()
+                        return
+                    }
+                    var data = results.data
+                    var member = new MemberModel(data)
+                    mergedData.push(member)
+                    console.log(mergedData.length)
+                    setRowsProcessed(mergedData.length)
+                    parser.resume()
+                },
+                error: (err) => {
+                    alert(err)
+                },
+                complete: (results, file) => {
+                    setProgress(100)
+                    setProcessing(false)
+                    processSuccess()
+                }
+            })
         }
         dialogManager.updateDialogMsg(dialog)
     }
@@ -74,7 +121,7 @@ function UploadPage() {
                             {(userManager) => (
                                 userManager.user ?
                                 <Box>
-                                    <UploadPanel proceed={proceed} handleCSVFileSelect={handleCSVFileSelect} handleXMLFileSelect={handleXMLFileSelect} csvParseOptions={csvParseOptions} csvFile={csvFile} xmlFile={xmlFile} progress={progress} px={StandardPadding.PX} py={StandardPadding.PY} />
+                                    <UploadPanel rowsProcessed={rowsProcessed} processing={processing} proceed={proceed} abortProcessing={abortProcessing} handleCSVFileSelect={handleCSVFileSelect} handleXMLFileSelect={handleXMLFileSelect} csvFile={csvFile} xmlFile={xmlFile} progress={progress} px={StandardPadding.PX} py={StandardPadding.PY} />
                                 </Box>
                                 :
                                 <Box>
