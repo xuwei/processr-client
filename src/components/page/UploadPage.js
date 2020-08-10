@@ -10,6 +10,8 @@ import ObjectUtil from '../util/ObjectUtil'
 import DateUtil from '../util/DateUtil'
 import Papa from 'papaparse'
 import MemberModel from '../model/MemberModel'
+import RandomMemberModel from '../model/RandomMemberModel'
+import axios from 'axios'
 
 function UploadPage() {
 
@@ -22,7 +24,14 @@ function UploadPage() {
     const [aborting, setAborting] = useState(false)
     const [rowsProcessed, setRowsProcessed] = useState(0)
     var mergedData = [] 
+    var counter = 0 
     var abort = false
+    var err = null
+    const BatchSizeToPost = 500
+
+    const postUrl = () => {
+        return 'http://localhost:8080/members'
+    }
 
     const handleCSVFileSelect = (e) => {
         const csv = e.target.files[0];
@@ -63,11 +72,40 @@ function UploadPage() {
         dialogManager.updateDialogMsg(dialog)
     }
 
+    const completedProcessing = ()=> {
+        setProgress(100)
+        setProcessing(false)
+        if (err == null) {
+            processSuccess()
+        } else {
+            processFailed()
+        }
+    }
+
     const abortProcessing = (e) => {
-        abort = true 
+        setAborting(true)
+    }
+
+    const postData = (reqBody, reqUrl, successHandler, errHandler)=> {
+        axios({
+            method: 'post',
+            headers: {
+                "Content-Type":"application/json",
+                "Access-Control-Allow-Origin": true,
+                "Access-Control-Allow-Method": "POST"
+
+            }, 
+            url: reqUrl,
+            data: reqBody
+        }).then((res)=> {
+            successHandler(res)
+        }).catch((error)=> {
+            errHandler(error)
+        })
     }
 
     const proceed = (e) => {
+        counter = 0;
         var dialog = new DialogModel("Message", "Will process files now", "Ok")
         dialog.callback = ()=> {
             setProcessing(true)
@@ -79,31 +117,59 @@ function UploadPage() {
                 fastMode: true, 
                 step: (results, parser) => {
                     parser.pause()
-                    console.log("abort - " + abort)
-                    if(abort === true) {
+                    if(aborting === true) {
                         parser.abort()
                         debugger;
                         return
                     }
-                    var data = results.data
-                    var member = new MemberModel(data)
+                    // var data = results.data
+                    var member = new RandomMemberModel()  
                     mergedData.push(member)
-                    console.log(mergedData.length)
                     setRowsProcessed(mergedData.length)
-                    parser.resume()
+                    counter += 1
+                    if (counter === BatchSizeToPost) {
+                        var arr = mergedData.slice(mergedData.length - BatchSizeToPost, mergedData.length)
+                        postData(arr, postUrl(), (res)=>{
+                            console.log("posted:")
+                            console.log(arr) 
+                            counter = 0
+                            parser.resume()
+                        }, (error)=>{
+                            err = error
+                            counter = 0 
+                            parser.abort()
+                        })
+                    } else {
+                        parser.resume()
+                    }
                 },
-                error: (err) => {
+                error: (error) => {
+                    err = error
+                    counter = 0
                     alert(err)
                 },
                 complete: (results, file) => {
-                    setProgress(100)
-                    setProcessing(false)
-                    processSuccess()
+                    var remaining = mergedData.length % 500
+                    if (counter > 0 && remaining > 0) {
+                        var arr = mergedData.slice(mergedData.length - remaining, mergedData.length)
+                        postData(arr, postUrl(), (res)=>{
+                            console.log(res)
+                            console.log(mergedData.length)
+                            counter = 0
+                        }, (error)=>{
+                            err = error
+                            counter = 0 
+                        })
+                    }
+
+                    completedProcessing()
                 }
             })
         }
         dialogManager.updateDialogMsg(dialog)
     }
+
+    
 
     // handle whenever file is select
     useEffect(()=> {

@@ -22,6 +22,7 @@ export default class MemberModel {
         Object.assign(this, data);
     }
 
+    // add validation to fields here 
     isValid = ()=> {
         return true 
     }
