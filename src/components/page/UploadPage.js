@@ -9,6 +9,7 @@ import { StandardPadding, ContentWidth } from '../Configs'
 import ObjectUtil from '../util/ObjectUtil'
 import DateUtil from '../util/DateUtil'
 import Papa from 'papaparse'
+import { reactLocalStorage } from 'reactjs-localstorage';
 import MemberModel from '../model/MemberModel'
 import RandomMemberModel from '../model/RandomMemberModel'
 import axios from 'axios'
@@ -21,16 +22,30 @@ function UploadPage() {
     const [xmlFile, setXmlFile] = useState(null)
     const [progress, setProgress] = useState(0) 
     const [processing, setProcessing] = useState(false)
-    const [aborting, setAborting] = useState(0)
+    const [aborting, setAborting] = useState(false)
     const [rowsProcessed, setRowsProcessed] = useState(0)
     var mergedData = [] 
     var counter = 0 
     var err = null
-    var currentParser = null 
     const BatchSizeToPost = 500
-
+    const Unknown = "unknown"
+    var postedBy = Unknown
     const postUrl = () => {
-        return 'http://localhost:8080/members'
+        var postUrl = process.env.SPRINGBOOT !== undefined ? process.env.SPRINGBOOT + "/members" : 'http://localhost:8080/members'
+        return postUrl
+    }
+
+    function isAborting() {
+        return aborting
+    }
+
+    const getPostedBy = () => {
+        var existingUser = reactLocalStorage.getObject('user');
+        if (existingUser.email) {
+            return existingUser.email 
+        } else {
+            return Unknown
+        }
     }
 
     const handleCSVFileSelect = (e) => {
@@ -64,7 +79,7 @@ function UploadPage() {
     }
     
     const processSuccess = () => {
-        var dialog = new DialogModel("Message", "Processing completed !", "Get JSON file")
+        var dialog = new DialogModel("Message", "Processing completed ! Click download to retrieve JSON file, download might take few seconds to complete.", "Download")
         dialog.callback = ()=> {
             setProgress(0)
             var prefix = ""
@@ -92,7 +107,7 @@ function UploadPage() {
     }
 
     const abortProcessing = (e) => {
-        setAborting(1)
+        setAborting(true)
     }
 
     const postData = (reqBody, reqUrl, successHandler, errHandler)=> {
@@ -114,6 +129,7 @@ function UploadPage() {
     }
 
     const proceed = (e) => {
+        postedBy = getPostedBy()
         counter = 0;
         var dialog = new DialogModel("Message", "Will process files now", "Ok")
         dialog.callback = ()=> {
@@ -125,15 +141,16 @@ function UploadPage() {
                 skipEmptyLines: true,
                 fastMode: true, 
                 step: (results, parser) => {
-                    currentParser = parser 
                     parser.pause()
-                    if(aborting === 1) {
-                        debugger;
-                        setAborting(0)
+                    console.log("aborting inside step: " + isAborting())
+                    if(isAborting()) {
+                        setAborting(false)
                         parser.abort()
                     } else {
-                        // var data = results.data
-                        var member = new RandomMemberModel()  
+                        var data = results.data
+                        const member = new MemberModel(data)
+                        // const member = new RandomMemberModel()
+                        data["postedBy"] = postedBy 
                         mergedData.push(member)
                         setRowsProcessed(mergedData.length)
                         counter += 1
@@ -159,7 +176,6 @@ function UploadPage() {
                     counter = 0
                 },
                 complete: (results, file) => {
-                    currentParser = null
                     var remaining = mergedData.length % BatchSizeToPost
                     if (counter > 0 && remaining > 0) {
                         var arr = mergedData.slice(mergedData.length - remaining, mergedData.length)
@@ -181,17 +197,6 @@ function UploadPage() {
         }
         dialogManager.updateDialogMsg(dialog)
     }
-
-    
-
-    // handle whenever file is select
-    useEffect(()=> {
-        if (currentParser != null && aborting === 1) {
-            debugger;
-            aborting = 0
-            currentParser.abort() 
-        }
-    }, [setAborting])
 
     // user's upload history 
     useEffect(() => {

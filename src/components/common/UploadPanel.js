@@ -56,11 +56,7 @@ function UploadPanel(props) {
                         Proceed
                     </Button>
                     <br/><br/>
-                    <Box hidden={!props.processing} px={4} pb={4}>
-                        <Button  id="abort" size="large" variant="contained" color="secondary" onClick={props.abortProcessing}>
-                            Abort
-                        </Button>
-                    </Box>
+                    <Typography hidden={!props.processing} variant="caption">Close tab to abort current process</Typography>
                 </Box>
             </Paper>
         </Box>

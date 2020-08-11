@@ -17,6 +17,7 @@ export default class MemberModel {
     memberPayrollNumber;
     memberEmploymentStatus;
     memberFundRegistrationDate;
+    postedBy;
 
     constructor(data) {
         Object.assign(this, data);

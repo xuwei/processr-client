@@ -19,6 +19,7 @@ export default class RandomMemberModel {
     memberPayrollNumber
     memberEmploymentStatus
     memberFundRegistrationDate
+    postedBy
 
     constructor() {
         this.transactionIdentifier = StringUtil.randomIntString(3)
@@ -39,6 +40,7 @@ export default class RandomMemberModel {
         this.memberPayrollNumber = StringUtil.randomString(10)
         this.memberEmploymentStatus = StringUtil.randomString(10)
         this.memberFundRegistrationDate = StringUtil.randomString(10)
+        this.posted = "unknown"
     }
 
     isValid = ()=> {
