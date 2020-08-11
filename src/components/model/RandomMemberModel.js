@@ -24,23 +24,23 @@ export default class RandomMemberModel {
     constructor() {
         this.transactionIdentifier = StringUtil.randomIntString(3)
         this.employerName = StringUtil.randomString(10)
-        this.employerName = StringUtil.randomString(10)
-        this.employerABN = StringUtil.randomString(10)
-        this.fundIdentifier = StringUtil.randomString(10)
-        this.fundEmployerIdentifier = StringUtil.randomString(10)
+        this.employerABN = StringUtil.randomIntString(10)
+        this.fundIdentifier = StringUtil.randomIntString(10)
+        this.fundEmployerIdentifier = StringUtil.randomIntString(10)
         this.memberFirstName = StringUtil.randomString(10)
+        this.memberOtherNames = StringUtil.randomString(10)
         this.memberLastName = StringUtil.randomString(10)
-        this.memberDateOfBirth = StringUtil.randomString(10)
-        this.memberGender = StringUtil.randomString(10)
+        this.memberDateOfBirth = "25/10/1980"
+        this.memberGender = "Male"
         this.memberAddress = StringUtil.randomString(10)
-        this.memberEmail = StringUtil.randomString(10)
+        this.memberEmail = "email.xuwei@gmail.com"
         this.memberContactNumber = StringUtil.randomString(10)
         this.memberNumber = StringUtil.randomString(10)
         this.memberTFN = StringUtil.randomString(10)
         this.memberPayrollNumber = StringUtil.randomString(10)
-        this.memberEmploymentStatus = StringUtil.randomString(10)
-        this.memberFundRegistrationDate = StringUtil.randomString(10)
-        this.posted = "unknown"
+        this.memberEmploymentStatus = "Fulltime"
+        this.memberFundRegistrationDate = "25/10/1980"
+        this.posted = "email.xuwei@gmail.com"
     }
 
     isValid = ()=> {

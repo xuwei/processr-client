@@ -142,14 +142,12 @@ function UploadPage() {
                 fastMode: true, 
                 step: (results, parser) => {
                     parser.pause()
-                    console.log("aborting inside step: " + isAborting())
                     if(isAborting()) {
                         setAborting(false)
                         parser.abort()
                     } else {
                         var data = results.data
                         const member = new MemberModel(data)
-                        // const member = new RandomMemberModel()
                         data["postedBy"] = postedBy 
                         mergedData.push(member)
                         setRowsProcessed(mergedData.length)

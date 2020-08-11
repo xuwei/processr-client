@@ -6,6 +6,7 @@ export default class MemberModel {
     fundIdentifier;
     fundEmployerIdentifier;
     memberFirstName;
+    memberOtherNames;
     memberLastName;
     memberDateOfBirth;
     memberGender;
