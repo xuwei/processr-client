@@ -149,7 +149,7 @@ function UploadPage() {
                     alert(err)
                 },
                 complete: (results, file) => {
-                    var remaining = mergedData.length % 500
+                    var remaining = mergedData.length % BatchSizeToPost
                     if (counter > 0 && remaining > 0) {
                         var arr = mergedData.slice(mergedData.length - remaining, mergedData.length)
                         postData(arr, postUrl(), (res)=>{
