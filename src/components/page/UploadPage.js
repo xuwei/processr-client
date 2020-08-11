@@ -147,8 +147,8 @@ function UploadPage() {
                         parser.abort()
                     } else {
                         var data = results.data
-                        const member = new MemberModel(data)
                         data["postedBy"] = postedBy 
+                        const member = new MemberModel(data)
                         mergedData.push(member)
                         setRowsProcessed(mergedData.length)
                         counter += 1
