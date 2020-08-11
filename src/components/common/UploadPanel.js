@@ -27,7 +27,7 @@ function UploadPanel(props) {
                     </Box>
                     <Box px={4} pb={4}>
                         <Box visibility="hidden">
-                            <Input id="csvSelect" type="file" accept=".csv" capture="capture" onChange={props.handleCSVFileSelect} />
+                            <Input id="csvSelect" type="file" accept="text/csv, .csv" capture="capture" onChange={props.handleCSVFileSelect} />
                         </Box>
                         { props.csvFile ? 
                         <Typography variant="subtitle1">{props.csvFile.name},{ObjectUtil.bytesToSize(props.csvFile.size)}</Typography>
@@ -52,7 +52,7 @@ function UploadPanel(props) {
                         </Button>
                     </Box>
                     <br/>
-                    <Button disabled={props.processing} id="proceed" size="large" variant="contained" color="primary" onClick={props.proceed}>
+                    <Button disabled={props.processing || props.csvFile == null} id="proceed" size="large" variant="contained" color="primary" onClick={props.proceed}>
                         Proceed
                     </Button>
                     <br/><br/>

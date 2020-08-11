@@ -21,12 +21,12 @@ function UploadPage() {
     const [xmlFile, setXmlFile] = useState(null)
     const [progress, setProgress] = useState(0) 
     const [processing, setProcessing] = useState(false)
-    const [aborting, setAborting] = useState(false)
+    const [aborting, setAborting] = useState(0)
     const [rowsProcessed, setRowsProcessed] = useState(0)
     var mergedData = [] 
     var counter = 0 
-    var abort = false
     var err = null
+    var currentParser = null 
     const BatchSizeToPost = 500
 
     const postUrl = () => {
@@ -35,8 +35,17 @@ function UploadPage() {
 
     const handleCSVFileSelect = (e) => {
         const csv = e.target.files[0];
-        setCsvFile(csv)
-        setProgress(0)
+        var components = csv.name.split(".")
+        if (components.length < 2) { 
+            setCsvFile(null)
+            setProgress(0) 
+        } else if (components[1] === "csv") {
+            setCsvFile(csv)
+            setProgress(0)
+        } else {
+            setCsvFile(null)
+            setProgress(0) 
+        }
     }
 
     const handleXMLFileSelect = (e) => {
@@ -46,8 +55,8 @@ function UploadPage() {
         setProgress(0)
     }
 
-    const processFailed = (invalidData) => {
-        var dialog = new DialogModel("Message", "Processing failed ! Invalid data confronted: " + invalidData, "Ok")
+    const processFailed = (err) => {
+        var dialog = new DialogModel("Error", err.toString(), "Ok")
         dialog.callback = ()=> {
             setCsvFile(null)
         }
@@ -78,12 +87,12 @@ function UploadPage() {
         if (err == null) {
             processSuccess()
         } else {
-            processFailed()
+            processFailed(err)
         }
     }
 
     const abortProcessing = (e) => {
-        setAborting(true)
+        setAborting(1)
     }
 
     const postData = (reqBody, reqUrl, successHandler, errHandler)=> {
@@ -116,39 +125,41 @@ function UploadPage() {
                 skipEmptyLines: true,
                 fastMode: true, 
                 step: (results, parser) => {
+                    currentParser = parser 
                     parser.pause()
-                    if(aborting === true) {
-                        parser.abort()
+                    if(aborting === 1) {
                         debugger;
-                        return
-                    }
-                    // var data = results.data
-                    var member = new RandomMemberModel()  
-                    mergedData.push(member)
-                    setRowsProcessed(mergedData.length)
-                    counter += 1
-                    if (counter === BatchSizeToPost) {
-                        var arr = mergedData.slice(mergedData.length - BatchSizeToPost, mergedData.length)
-                        postData(arr, postUrl(), (res)=>{
-                            console.log("posted:")
-                            console.log(arr) 
-                            counter = 0
-                            parser.resume()
-                        }, (error)=>{
-                            err = error
-                            counter = 0 
-                            parser.abort()
-                        })
+                        setAborting(0)
+                        parser.abort()
                     } else {
-                        parser.resume()
+                        // var data = results.data
+                        var member = new RandomMemberModel()  
+                        mergedData.push(member)
+                        setRowsProcessed(mergedData.length)
+                        counter += 1
+                        if (counter === BatchSizeToPost) {
+                            var arr = mergedData.slice(mergedData.length - BatchSizeToPost, mergedData.length)
+                            postData(arr, postUrl(), (res)=>{
+                                console.log("posted:")
+                                console.log(arr) 
+                                counter = 0
+                                parser.resume()
+                            }, (error)=>{
+                                err = error
+                                counter = 0 
+                                parser.abort()
+                            })
+                        } else {
+                            parser.resume()
+                        }
                     }
                 },
                 error: (error) => {
                     err = error
                     counter = 0
-                    alert(err)
                 },
                 complete: (results, file) => {
+                    currentParser = null
                     var remaining = mergedData.length % BatchSizeToPost
                     if (counter > 0 && remaining > 0) {
                         var arr = mergedData.slice(mergedData.length - remaining, mergedData.length)
@@ -156,13 +167,15 @@ function UploadPage() {
                             console.log(res)
                             console.log(mergedData.length)
                             counter = 0
+                            completedProcessing()
                         }, (error)=>{
                             err = error
                             counter = 0 
+                            completedProcessing()
                         })
+                    } else {
+                        completedProcessing()
                     }
-
-                    completedProcessing()
                 }
             })
         }
@@ -173,9 +186,12 @@ function UploadPage() {
 
     // handle whenever file is select
     useEffect(()=> {
-        console.log(csvFile)
-        console.log(xmlFile)
-    }, [csvFile, xmlFile])
+        if (currentParser != null && aborting === 1) {
+            debugger;
+            aborting = 0
+            currentParser.abort() 
+        }
+    }, [setAborting])
 
     // user's upload history 
     useEffect(() => {
