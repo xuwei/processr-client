@@ -6,11 +6,11 @@ import UploadPage from './page/UploadPage'
 import NotFoundPage from './page/NotFoundPage'
 import Footer from './common/Footer'
 import NavBar from './common/NavBar'
-import AppDialog from './AppDialog'
 import { createMuiTheme, MuiThemeProvider, responsiveFontSizes } from '@material-ui/core/styles'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import { themeContext } from './context/ThemeContext'
 import { reactLocalStorage } from 'reactjs-localstorage';
+import AppDiaLog from './AppDialog'
 
 function App() {
 
@@ -44,6 +44,7 @@ function App() {
     <MuiThemeProvider theme={processrTheme}>
       <themeContext.Provider value={{darkTheme: themeManager.darkTheme, updateDarkTheme: updateTheme}}>
       <CssBaseline />
+      <AppDiaLog>
       <Router>
         <div className="App">
           <NavBar />
@@ -56,6 +57,7 @@ function App() {
           <Footer />
         </div>
       </Router>
+      </AppDiaLog>
       </themeContext.Provider>
     </MuiThemeProvider>
   )

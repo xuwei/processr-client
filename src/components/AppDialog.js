@@ -6,43 +6,61 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { Button } from '@material-ui/core'
 import { dialogContext } from './context/DialogContext'
+import ObjectUtil from './util/ObjectUtil'
 
 function AppDialog(props) {
   const [open, setOpen] = useState(false);
   const [dialogMsg, setDialogMsg] = useState(null)
 
-  const showDialog = (msg) => {
-    setDialogMsg(msg)
+  const showDialog = (model) => {
+    setDialogMsg(model)
   }
 
-  const handleClose = () => {
-    setDialogMsg(null);
+  const close = ()=> {
+    setOpen(false)
   }
+
+  useEffect(()=> {
+    if (open === false) {
+      if (dialogMsg != null && ObjectUtil.isFunction(dialogMsg.callback))  {
+        dialogMsg.callback()
+      }
+    }
+  }, [open])
 
   useEffect(() => {
-    dialogMsg == null ? setOpen(false) : setOpen(true)
+    const model = dialogMsg
+    if (model != null && model.title != null && model.message != null && model.confirm != null) {
+      setOpen(true)
+    }
   }, [dialogMsg])
 
+  if (dialogMsg === null) {
+    return(
+      <dialogContext.Provider value={{updateDialogMsg : showDialog}}>
+        {props.children}
+      </dialogContext.Provider>
+    )
+  }
   return (
-    <dialogContext.Provider value={{updateDialogMsg : setDialogMsg}}>
+    <dialogContext.Provider value={{updateDialogMsg : showDialog}}>
       {props.children}
       <Dialog
         open={open}
-        onClose={handleClose}
+        onClose={close}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">{"Use Google's location service?"}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">{dialogMsg.title}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Let Google help apps determine location. This means sending anonymous location data to
-            Google, even when no apps are running.
-            </DialogContentText>
+            {dialogMsg.message}
+          </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="primary">
-            Ok
-            </Button>
+          <Button color="primary" onClick={close}>
+            {dialogMsg.confirm}
+          </Button>
         </DialogActions>
       </Dialog>
     </dialogContext.Provider>

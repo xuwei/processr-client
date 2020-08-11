@@ -2,13 +2,15 @@ import React, { useState, useContext, useEffect } from 'react';
 import { Switch, Link, Menu, MenuItem, Box, Button, Typography, Toolbar, AppBar } from '@material-ui/core'
 import MenuIcon from '@material-ui/icons/Menu';
 import UserUtil from '../util/UserUtil'
-import MessageUtil from '../util/MessageUtil'
 import { userContext }  from '../context/UserContext'
 import { themeContext } from '../context/ThemeContext'
+import { dialogContext } from '../context/DialogContext'
 import { reactLocalStorage } from 'reactjs-localstorage';
+import DialogModel from '../model/DialogModel'
 
 function NavBar() {
 
+    const dialogManager = useContext(dialogContext)
     const userManager = useContext(userContext)
     const themeManager = useContext(themeContext)
     const [anchorEl, setAnchorEl] = useState(null)
@@ -31,7 +33,8 @@ function NavBar() {
         UserUtil.login().then((loggedInUser)=>{
             userManager.updateUser(loggedInUser)
         }).catch((error)=> {
-            MessageUtil.messagePopup(error)
+            const dialog = new DialogModel("Message", error, "Ok")
+            dialogManager.updateDialogMsg(dialog)
         })
     }
 

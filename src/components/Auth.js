@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import UserUtil from './util/UserUtil'
-import MessageUtil from './util/MessageUtil'
 import { userContext } from './context/UserContext'
 
 function Auth(props) {
@@ -15,7 +14,7 @@ function Auth(props) {
         UserUtil.fetchUser().then((loggedInUser) => {
             setUser(loggedInUser)
         }).catch((error)=> {
-            MessageUtil.messagePopup(error)
+            alert(error)
         })
     }, [])
 

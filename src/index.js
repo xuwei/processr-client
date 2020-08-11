@@ -3,15 +3,12 @@ import ReactDOM from 'react-dom'
 import * as serviceWorker from './serviceWorker'
 import App from './components/App'
 import Auth from './components/Auth'
-import AppDiaLog from './components/AppDialog'
 
 ReactDOM.render(
   <React.StrictMode>
-    <Auth>
-    <AppDiaLog>
-      <App />
-    </AppDiaLog>
-    </Auth>
+      <Auth>
+        <App/>
+      </Auth>    
   </React.StrictMode>,
   document.getElementById('root')
 );
